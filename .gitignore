@@ -1,34 +1,23 @@
 ﻿# Python
 __pycache__/
-*.py[codz]
-*$py.class
+*.py[cod]
 *.pyo
 *.pyd
 *.so
-*.egg
 *.egg-info/
+*.egg
 *.whl
 pip-wheel-metadata/
 
-# Packaging
-.Python
-build/
-dist/
-*.manifest
-*.spec
-
-# Environments
-.env
-.envrc
+# Virtual envs
 .venv/
 venv/
 ENV/
-__pypackages__/
 
 # Jupyter
 .ipynb_checkpoints/
 
-# Tests/coverage
+# Test/coverage
 .pytest_cache/
 .coverage
 .coverage.*
@@ -53,11 +42,3 @@ mlruns/
 # Editors
 .vscode/
 .idea/
-
-# Ruff
-.ruff_cache/
-
-# Misc
-.pypirc
-.cursorignore
-.cursorindexingignore
