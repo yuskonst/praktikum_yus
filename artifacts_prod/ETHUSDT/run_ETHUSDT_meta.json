@@ -1,0 +1,280 @@
+{
+  "symbol": "ETHUSDT",
+  "profile": {
+    "data": {
+      "symbols": [
+        "ETHUSDT"
+      ],
+      "start": "2016-01-01",
+      "end": null,
+      "timezone": "UTC",
+      "forex_pairs_for_fxvol_rv": [
+        "EURUSD=X",
+        "USDJPY=X",
+        "GBPUSD=X",
+        "AUDUSD=X",
+        "USDCAD=X",
+        "USDCHF=X",
+        "NZDUSD=X"
+      ],
+      "crypto_hourly_window": {
+        "H<=1": 168,
+        "2..7": 120
+      }
+    },
+    "cv": {
+      "outer_test_frac": 0.15,
+      "purged_kfold": 3,
+      "embargo_frac": 0.02,
+      "internal": {
+        "1": {
+          "K": 4,
+          "valid_months": 2
+        },
+        "5": {
+          "K": 3,
+          "valid_months": 3
+        },
+        "14": {
+          "K": 3,
+          "valid_months": 4
+        },
+        "30": {
+          "K": 3,
+          "valid_months": 5
+        }
+      }
+    },
+    "hpo": {
+      "n_trials": 6,
+      "sampler": "NSGAII",
+      "pruner": "ASHA",
+      "pruner_params": {
+        "min_resource": 3,
+        "reduction_factor": 3
+      },
+      "pareto_topk": 2,
+      "constraints": {
+        "sMAPE_max": 0.6,
+        "MASE_max": 2.0
+      },
+      "budget_epochs_fraction": 0.25
+    },
+    "train": {
+      "optimizer": "AdamW",
+      "lr": 0.0003,
+      "weight_decay": 0.0001,
+      "dropout": 0.1,
+      "min_seq_len": 16,
+      "clip_grad_norm": 1.0,
+      "amp": true,
+      "grad_accum_steps": 1,
+      "grad_checkpointing": true,
+      "scheduler": {
+        "name": "cosine",
+        "warmup_frac": 0.1
+      },
+      "batch_size": 32,
+      "epochs": {
+        "1": 60,
+        "5": 70,
+        "14": 80,
+        "30": 90
+      },
+      "seq_len": {
+        "1": 96,
+        "5": 144,
+        "14": 192,
+        "30": 256
+      }
+    },
+    "models": {
+      "vae": {
+        "latent_dim": 32,
+        "hidden": 128,
+        "layers": 1,
+        "dropout": 0.1,
+        "enabled": true
+      },
+      "lstm": {
+        "hidden": 192,
+        "layers": 2,
+        "dropout": 0.1
+      },
+      "informer": {
+        "d_model": 160,
+        "n_heads": 4,
+        "layers": 3,
+        "ff_mult": 2,
+        "dropout": 0.1,
+        "attn": "prob-sparse"
+      },
+      "ensemble": {
+        "weights_learn": "softmax",
+        "enabled": true
+      }
+    },
+    "pbt": {
+      "population": 4,
+      "interval_val_epochs": 2,
+      "perturb": {
+        "lr": [
+          0.8,
+          1.2
+        ],
+        "dropout": [
+          -0.05,
+          0.05
+        ],
+        "weight_decay": [
+          0.5,
+          2.0
+        ]
+      },
+      "ema_decay": 0.999,
+      "use_lookahead": true
+    },
+    "exog_vol": {
+      "enabled": true,
+      "indices": "^VIX",
+      "commodities": "^OVX",
+      "crypto": "ETHVOL_DERIBIT",
+      "fx": "FXVOL_RV_PC1"
+    },
+    "artifacts": {
+      "out_dir": "./artifacts_prod",
+      "save_oof": true,
+      "save_models": true,
+      "save_config": true
+    }
+  },
+  "results": {
+    "1": {
+      "metrics": {
+        "RMSE": 1205.6533171593053,
+        "MAE": 1087.0277840198223,
+        "sMAPE": 0.31788139311251107,
+        "MASE": 10.611179889369243,
+        "MDA": 0.52,
+        "DM_stat": -41.483720348355874,
+        "DM_p": 0.0
+      },
+      "weights": [
+        1.0
+      ],
+      "top_configs": [
+        {
+          "params": {
+            "model": "lstm",
+            "lr": 0.0006813099824138595,
+            "weight_decay": 1.2087541473056965e-06,
+            "dropout": 0.38796394086479774,
+            "hidden": 224,
+            "layers": 1
+          },
+          "rmse": 691.6344709471206,
+          "one_minus_mda": 0.5088652482269505,
+          "conf": {
+            "optimizer": "AdamW",
+            "lr": 0.0003,
+            "weight_decay": 0.0001,
+            "dropout": 0.1,
+            "clip_grad_norm": 1.0,
+            "amp": true,
+            "grad_accum_steps": 1,
+            "scheduler": {
+              "name": "cosine",
+              "warmup_frac": 0.1
+            },
+            "batch_size": 32,
+            "epochs": 60,
+            "seq_len": 96
+          },
+          "valid": true,
+          "holdout_metrics": {
+            "RMSE": 1271.3373063692845,
+            "MAE": 1236.482194247159,
+            "sMAPE": 0.3722247478792385,
+            "MASE": 10.788031300839355,
+            "MDA": 0.5272727272727272,
+            "DM_stat": -42.32367493513053,
+            "DM_p": 0.0
+          }
+        }
+      ],
+      "predictions_path": "./artifacts_prod\\ETHUSDT\\forecast_ETHUSDT_H1.csv",
+      "plot_path": "./artifacts_prod\\ETHUSDT\\plot_ETHUSDT_H1.png",
+      "data_health": {
+        "seq_len_requested": 96,
+        "seq_len_used": 96,
+        "train_points": 849,
+        "test_points": 150,
+        "required_points": 97,
+        "train_ok": true,
+        "test_ok": true,
+        "train_windows": 754,
+        "test_windows": 55,
+        "cv_splits": [
+          {
+            "train_len": 549,
+            "valid_len": 283
+          },
+          {
+            "train_len": 532,
+            "valid_len": 283
+          },
+          {
+            "train_len": 549,
+            "valid_len": 283
+          }
+        ]
+      },
+      "feature_health": {
+        "rows": 999,
+        "cols": 40,
+        "nan_columns": {},
+        "all_nan_columns": [],
+        "zero_var_columns": [],
+        "dropped_rows": 0,
+        "dropped_columns": [
+          "vae_latent_0",
+          "vae_latent_1",
+          "vae_latent_2",
+          "vae_latent_3",
+          "vae_latent_4",
+          "vae_latent_5",
+          "vae_latent_6",
+          "vae_latent_7",
+          "vae_latent_8",
+          "vae_latent_9",
+          "vae_latent_10",
+          "vae_latent_11",
+          "vae_latent_12",
+          "vae_latent_13",
+          "vae_latent_14",
+          "vae_latent_15",
+          "vae_latent_16",
+          "vae_latent_17",
+          "vae_latent_18",
+          "vae_latent_19",
+          "vae_latent_20",
+          "vae_latent_21",
+          "vae_latent_22",
+          "vae_latent_23",
+          "vae_latent_24",
+          "vae_latent_25",
+          "vae_latent_26",
+          "vae_latent_27",
+          "vae_latent_28",
+          "vae_latent_29",
+          "vae_latent_30",
+          "vae_latent_31"
+        ]
+      },
+      "forecast_health": {
+        "pred_count": 150,
+        "all_nan_predictions": false
+      }
+    }
+  }
+}
